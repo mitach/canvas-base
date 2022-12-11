@@ -13,6 +13,29 @@ drawGrid();
 frame();
 smiley();
 checker();
+labels();
+button('Let it snow', {x: 640, y: 280});
+
+const assets: { [name: string]: any } = {
+    bkImg: '/assets/bk.png',
+    wkImg: '/assets/wk.png'
+};
+
+let toLoad = Object.keys(assets).length;
+
+for (let name in assets) {
+    const img = new Image();
+    img.src = assets[name]
+    assets[name] = img;
+    img.addEventListener('load', assetLoaded);
+}
+
+function assetLoaded() {
+    toLoad--;
+    if (toLoad == 0) {
+        drawKings();
+    }
+}
 
 function drawGrid() {
     ctx.lineWidth = 1;
@@ -93,19 +116,61 @@ function rect(file: number, rank: number, color: string) {
 function checker() {
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
-            if (row % 2 == 0) {
-                if (col % 2 == 0) {
-                    rect(col, row, dark)
-                } else {
-                    rect(col, row, light)
-                }
-            } else {
-                if (col % 2 == 0) {
-                    rect(col, row, light)
-                } else {
-                    rect(col, row, dark)
-                }
-            }
+            row % 2 == 0 
+            ?   rect(col, row, col % 2 == 0 ? light : dark)
+            :   rect(col, row, col % 2 == 0 ? dark : light);
         }
     }
+}
+
+function labels() {
+    const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const numbers = ['8', '7', '6', '5', '4', '3', '2', '1'];
+    let xPos = 125;
+    let yPos = 125;
+
+    ctx.beginPath();
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (let letter of letters) {
+        ctx.fillText(letter, xPos, 75);
+        ctx.fillText(letter, xPos, 525);
+        xPos += 50
+    }
+
+    for (let number of numbers) {
+        ctx.fillText(number, 75, yPos);
+        ctx.fillText(number, 525, yPos);
+        yPos += 50
+    }
+    ctx.closePath();
+}
+
+function drawKings() {
+    for (let king in assets) {
+        if (king == 'bkImg') {
+            ctx.drawImage(assets[king], 300, 100, 50, 50)
+        } else if (king == 'wkImg') {
+            ctx.drawImage(assets[king], 300, 450, 50, 50)
+        }
+    }
+}
+
+function button(label: string, pos: {x: number, y: number}) {
+    ctx.beginPath();
+    ctx.lineWidth = 40;;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = dark;
+    ctx.moveTo(pos.x, pos.y);
+    ctx.lineTo(pos.x + 120, pos.y);
+    ctx.stroke();
+
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, pos.x + 60, pos.y);
+
+    ctx.closePath();
 }
